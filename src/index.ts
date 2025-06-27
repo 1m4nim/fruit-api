@@ -75,5 +75,5 @@ app.delete("/items/:id", (req: Request, res: Response) => {
 
 // サーバー起動
 app.listen(PORT, () => {
-  console.log(`🍎 APIサーバー起動中: http://localhost:${PORT}/items`);
+  console.log(`🍎 APIサーバー起動中: http://localhost:${PORT}`);
 });

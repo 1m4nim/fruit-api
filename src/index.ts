@@ -1,9 +1,11 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import cors from "cors";
 import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 const PORT = 3000;
 
+app.use(cors());
 app.use(express.json());
 
 type Item = {
@@ -14,17 +16,16 @@ type Item = {
 
 let items: Item[] = [];
 
-// 商品一覧取得
-app.get("/", (req: Request, res: Response) => {
-res.send("Fruit APIへようこそ！")
+// 一覧取得
+app.get("/items", (req, res) => {
+  res.json(items);
 });
 
-// 新規商品追加
-app.post("/items", (req: Request, res: Response) => {
+// 追加
+app.post("/items", (req, res) => {
   const { name, quantity } = req.body;
-
   if (!name || typeof quantity !== "number") {
-    return res.status(400).json({ message: "Invalid request body" });
+    return res.status(400).json({ message: "Invalid data" });
   }
 
   const newItem: Item = {
@@ -37,43 +38,7 @@ app.post("/items", (req: Request, res: Response) => {
   res.status(201).json(newItem);
 });
 
-// 商品詳細取得
-app.get("/items/:id", (req: Request, res: Response) => {
-  const item = items.find((i) => i.id === req.params.id);
-  if (!item) {
-    return res.status(404).json({ message: "Item not found" });
-  }
-  res.json(item);
-});
-
-// 商品情報更新
-app.put("/items/:id", (req: Request, res: Response) => {
-  const index = items.findIndex((i) => i.id === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ message: "Item not found" });
-  }
-
-  const { name, quantity } = req.body;
-
-  // 部分的な更新も許可
-  if (name !== undefined) items[index].name = name;
-  if (quantity !== undefined) items[index].quantity = quantity;
-
-  res.json(items[index]);
-});
-
-// 商品削除
-app.delete("/items/:id", (req: Request, res: Response) => {
-  const item = items.find((i) => i.id === req.params.id);
-  if (!item) {
-    return res.status(404).json({ message: "Item not found" });
-  }
-
-  items = items.filter((i) => i.id !== req.params.id);
-  res.status(204).send(); // No Content
-});
-
-// サーバー起動
+// 起動
 app.listen(PORT, () => {
-  console.log(`🍎 APIサーバー起動中: http://localhost:${PORT}`);
+  console.log(`🍎 API running on http://localhost:${PORT}/items`);
 });
